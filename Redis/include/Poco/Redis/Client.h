@@ -24,6 +24,7 @@
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Timespan.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -130,6 +131,7 @@ public:
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
 	{
+		Poco::Mutex::ScopedLock lock(_mutex);
 		T result;
 		writeCommand(command, true);
 		readReply(result);
@@ -196,6 +198,7 @@ private:
 	Net::StreamSocket _socket;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
+	Poco::Mutex _mutex;
 };
 
 
